@@ -1,10 +1,10 @@
 import { useCallback, useEffect } from 'react';
 import { debounce } from 'lodash';
 
-import { useGlobal } from '../store';
+import { useStore } from '../store';
 
-const useWatchMediaQuery = (limits = [767, 1024, 1360, 1919]) => {
-  const { data: matchList, dispatch } = useGlobal('MediaQuery');
+const useWatchMediaQuery = (limits = [767, 1024, 1440, 1919]) => {
+  const { data: matchList, dispatch } = useStore('MediaQuery');
 
   const setMatchList = useCallback(
     (payload, tag) => {
@@ -30,12 +30,12 @@ const useWatchMediaQuery = (limits = [767, 1024, 1360, 1919]) => {
     }
 
     // 保存全部监听函数， 用于移除监听
-    const onChangeList = mediaQueryStrList.map((_, i) => {
+    const onChangeList = mediaList.map((media, i) => {
       // 防抖
       const onChange = debounce((ev) => {
         if (ev.matches) {
           // 只有一个 true, 无需更细致的判断
-          let newMatchList = new Array(mediaQueryStrList.length).fill(false);
+          let newMatchList = new Array(mediaList.length).fill(false);
           newMatchList[i] = true;
 
           setMatchList(newMatchList, i);
@@ -43,7 +43,7 @@ const useWatchMediaQuery = (limits = [767, 1024, 1360, 1919]) => {
       }, 100);
 
       // 监听变化
-      mediaList[i].addEventListener('change', onChange);
+      media.addEventListener('change', onChange);
       return onChange;
     });
 

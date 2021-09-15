@@ -1,112 +1,41 @@
-import { useCallback } from 'react';
-import { useGlobal } from '../store';
+import { useStore, useDispatch, useData } from '../store';
 
-export const Manager1 = () => {
-  const {
-    data: { count },
-    dispatch: countDispatch,
-  } = useGlobal('Count');
-
-  const login = useLogin();
+export const Manager = () => {
+  // 触发数据更新
+  const countDispatch = useDispatch('Count');
 
   return (
     <div>
-      <h3>manager: {count}</h3>
       <button onClick={() => countDispatch({ type: 'plus' })}>PLUS</button>
       <button onClick={() => countDispatch({ type: 'subtract' })}>
         SUBTRACT
       </button>
-
-      <button onClick={login}>登录</button>
     </div>
   );
 };
+export const Consume = () => {
+  // 消费数据
+  const { count } = useData('Count');
 
-export const Manager2 = () => {
-  const {
-    data: { count },
-    dispatch: countDispatch,
-  } = useGlobal('Count');
-  const { dispatch: userDispatch } = useGlobal('User');
+  return <h3> Consume: {count} </h3>;
+};
+
+export const MediaConsume = () => {
+  // 消费自适应监听结果
+  const [isMobile, isTablet, isPC, isWideMonitor, isHugeScreen] =
+    useData('MediaQuery');
 
   return (
     <div>
-      <h3>manager: {count}</h3>
-
-      <button onClick={() => countDispatch({ type: 'plus' })}>PLUS</button>
-      <button onClick={() => countDispatch({ type: 'subtract' })}>
-        SUBTRACT
-      </button>
-
-      <button onClick={() => userDispatch({ type: 'logout' })}>退出</button>
+      {isMobile
+        ? '手机'
+        : isTablet
+        ? '平板'
+        : isPC
+        ? 'PC'
+        : isWideMonitor
+        ? '大显示器'
+        : '大屏'}
     </div>
   );
-};
-
-export const Consume1 = () => {
-  const {
-    data: { count },
-  } = useGlobal('Count');
-  const {
-    data: { state, user },
-  } = useGlobal('User');
-
-  return (
-    <div>
-      <h3>
-        Consume1: {count}; userState:{' '}
-        {state === 'logout' ? '登出' : `${user?.name}-登入`}
-      </h3>
-    </div>
-  );
-};
-
-export const Consume2 = () => {
-  const {
-    data: { count },
-  } = useGlobal('Count');
-  const {
-    data: { state, user },
-  } = useGlobal('User');
-
-  const {
-    data: [isMobile, isTablet, isPC, isWideMonitor],
-  } = useGlobal('MediaQuery');
-
-  return (
-    <div>
-      <div>
-        {isMobile
-          ? '手机'
-          : isTablet
-          ? '平板'
-          : isPC
-          ? 'PC'
-          : isWideMonitor
-          ? '大显示器'
-          : '大屏'}
-      </div>
-
-      <h3>
-        Consume2: {count}; userState:{' '}
-        {state === 'logout' ? '登出' : `${user?.name}-登入`}
-      </h3>
-    </div>
-  );
-};
-
-const mockLogin = () =>
-  new Promise((resolve) => {
-    setTimeout(() => resolve({ name: 'elonwu' }), 2000);
-  });
-
-const useLogin = () => {
-  const { dispatch } = useGlobal('User');
-
-  const login = useCallback(async () => {
-    const user = await mockLogin();
-    dispatch({ type: 'login', payload: user });
-  }, []);
-
-  return login;
 };

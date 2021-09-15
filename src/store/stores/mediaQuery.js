@@ -1,10 +1,9 @@
 // 初始值
-const initialValue = [false, false, false, false];
+const initialValue = [];
 
 // 更新
 const reducers = {
   update(draft, payload = []) {
-    console.log({ mediaUpdate: payload });
     payload.forEach((value, i) => (draft[i] = value));
   },
 };

@@ -1,19 +1,28 @@
-import React, { useMemo } from "react";
-import { useImmerReducer } from "use-immer";
+import React, { useMemo } from 'react';
+import { useImmerReducer } from 'use-immer';
 
-import createContext from "../hooks/createContext";
-import duplicate from "../utils/duplicate";
+import createContext from '../hooks/createContext';
+import duplicate from '../utils/duplicate';
 
+const { Provider, useContext } = createContext('global');
 
-const { Provider, useContext } = createContext("global");
-
-export const useGlobalContext = (key) => {
+export const useStore = (key) => {
   const [value, dispatch] = useContext();
 
   return {
     data: value?.[key],
-    dispatch: ({ type, payload }) => dispatch({ key, type, payload })
+    dispatch: ({ type, payload }) => dispatch({ key, type, payload }),
   };
+};
+
+export const useDispatch = (key) => {
+  const { dispatch } = useStore(key);
+  return dispatch;
+};
+
+export const useData = (key) => {
+  const { data } = useStore(key);
+  return data;
 };
 
 export const GlobalProvider = ({ stores, children }) => {
@@ -22,10 +31,10 @@ export const GlobalProvider = ({ stores, children }) => {
       return { reducer: () => null, initialValue: {} };
     }
 
-    const duplicateKeys = duplicate(stores.map(store => store.key));
+    const duplicateKeys = duplicate(stores.map((store) => store.key));
 
     if (duplicateKeys.length > 0) {
-      console.error(`重复的key: ${duplicateKeys.join(";")}`);
+      console.error(`重复的key: ${duplicateKeys.join(';')}`);
       return { reducer: () => null, initialValue: {} };
     }
 
@@ -35,7 +44,7 @@ export const GlobalProvider = ({ stores, children }) => {
 
       const dispatchReducer = matchedStore?.reducers?.[type];
 
-      if (!matchedStore || typeof dispatchReducer !== "function") {
+      if (typeof dispatchReducer !== 'function') {
         console.error(`${key}/${type} 未匹配到合法的 reducer`);
       } else {
         const dispatchDraft = draft[matchedStore.key];
